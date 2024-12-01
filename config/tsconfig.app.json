@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ESNext",
+    "resolveJsonModule": true,
+
+    "lib": ["ES2023", "DOM"],
+    "types": [],
+
+    "baseUrl": "..",
+    "rootDir": "..",
+    "paths": {
+      "@/*": ["src/*"]
+    }
+  },
+  "include": ["../src", "../test"]
+}

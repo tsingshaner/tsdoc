@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.base.json",
+  "compilerOptions": {
+    "target": "ESNext",
+
+    "lib": ["ESNext"],
+
+    "rootDir": ".."
+  },
+  "include": ["../vite.config.ts"]
+}
