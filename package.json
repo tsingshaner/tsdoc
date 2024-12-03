@@ -1,8 +1,8 @@
 {
-  "name": "template",
+  "name": "@qingshaner/tsdoc",
   "type": "module",
   "version": "0.0.0",
-  "description": "a lib template for typescript",
+  "description": "A tsdoc generator",
   "author": {
     "name": "qingshaner",
     "url": "https://github.com/Jon-a-than"
@@ -11,9 +11,7 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs",
-      "default": "./dist/index.js"
+      "import": "./dist/index.js"
     }
   },
   "main": "dist/index.js",
