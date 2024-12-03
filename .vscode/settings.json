@@ -44,5 +44,6 @@
   },
   "[html]": {
     "editor.formatOnSave": false
-  }
+  },
+  "cSpell.words": ["citty"]
 }

@@ -18,6 +18,9 @@
   },
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "bin": {
+    "tsdoc-gen": "./bin/cli.js"
+  },
   "files": ["dist"],
   "engines": {
     "node": ">=20.0.0",
@@ -34,22 +37,30 @@
     "format": "biome format . --write",
     "lint": "biome lint . --write && eslint . --fix",
     "prepare": "simple-git-hooks",
+    "start": "jiti ./src/cli.ts",
     "test": "vitest run",
     "test:cov": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@microsoft/api-extractor-model": "^7.30.0",
+    "@microsoft/tsdoc": "^0.15.1",
+    "citty": "^0.1.6",
+    "consola": "^3.2.3"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@changesets/cli": "^2.27.10",
     "@qingshaner/eslint-config": "^0.8.0",
-    "@types/node": "^22.9.3",
-    "@vitest/coverage-v8": "^2.1.5",
-    "eslint": "^9.15.0",
+    "@types/node": "^22.10.1",
+    "@vitest/coverage-v8": "^2.1.6",
+    "eslint": "^9.16.0",
+    "jiti": "^2.4.1",
     "lint-staged": "^15.2.10",
     "simple-git-hooks": "^2.11.1",
     "typescript": "^5.7.2",
-    "vite": "^5.4.11",
+    "vite": "^6.0.1",
     "vite-plugin-dts": "^4.3.0",
-    "vitest": "^2.1.5"
+    "vitest": "^2.1.6"
   },
   "simple-git-hooks": {
     "pre-commit": "pnpm lint-staged",

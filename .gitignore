@@ -1,6 +1,7 @@
 dist
 cache
 .cache
+.temp
 coverage
 node_modules
 
