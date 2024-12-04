@@ -17,7 +17,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "tsdoc-gen": "./bin/cli.js"
+    "tsdoc-gen": "./bin/cli.mjs"
   },
   "files": ["dist"],
   "engines": {

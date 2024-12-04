@@ -19,8 +19,10 @@ export default defineConfig({
     },
     minify: false,
     rollupOptions: {
-      external: Object.keys((pkgJSON as { dependencies?: Record<string, string> }).dependencies ?? {})
-    }
+      external: (id) => id in pkgJSON.dependencies || id.startsWith('node:')
+    },
+    sourcemap: true,
+    target: 'node22'
   },
   plugins: [
     dts({
@@ -42,7 +44,7 @@ export default defineConfig({
         typescriptCompilerFolder: resolve(root, 'node_modules/typescript')
       },
       rollupTypes: true,
-      tsconfigPath: resolve(root, 'config/tsconfig.node.json')
+      tsconfigPath: resolve(root, 'tsconfig.json')
     })
   ],
   resolve: {
