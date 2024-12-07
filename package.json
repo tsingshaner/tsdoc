@@ -7,6 +7,7 @@
     "name": "qingshaner",
     "url": "https://github.com/Jon-a-than"
   },
+  "effects": false,
   "license": "ISC",
   "exports": {
     ".": {
@@ -19,7 +20,9 @@
   "bin": {
     "tsdoc-gen": "./bin/cli.mjs"
   },
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "engines": {
     "node": ">=20.0.0",
     "pnpm": ">=9.0.0"
@@ -43,7 +46,8 @@
     "@microsoft/api-extractor-model": "^7.30.0",
     "@microsoft/tsdoc": "^0.15.1",
     "citty": "^0.1.6",
-    "consola": "^3.2.3"
+    "consola": "^3.2.3",
+    "mdbox": "^0.1.1"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
