@@ -12,10 +12,7 @@ import type { PathLike } from 'node:fs'
  *
  * @public
  */
-export const isDirectory = async (path: PathLike) => {
-  const s = await stat(path)
-  return s.isDirectory()
-}
+export const isDirectory = async (path: PathLike) => (await stat(path)).isDirectory()
 
 /**
  * Clear a possible directory, if it doesn't exist, an empty directory will be created.
