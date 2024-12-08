@@ -1,4 +1,11 @@
 {
   "$schema": "node_modules/@biomejs/biome/configuration_schema.json",
-  "extends": ["@qingshaner/eslint-config/biome"]
+  "extends": ["@qingshaner/eslint-config/biome"],
+  "linter": {
+    "rules": {
+      "style": {
+        "useNamingConvention": "off"
+      }
+    }
+  }
 }

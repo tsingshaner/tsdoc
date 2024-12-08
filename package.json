@@ -38,7 +38,7 @@
     "format": "biome format . --write",
     "lint": "biome lint . --write && eslint . --fix",
     "prepare": "simple-git-hooks",
-    "start": "jiti ./src/cli.ts",
+    "start": "vite build -m dev && node ./bin/cli.mjs",
     "test": "vitest run",
     "test:cov": "vitest run --coverage"
   },
@@ -47,16 +47,17 @@
     "@microsoft/tsdoc": "^0.15.1",
     "citty": "^0.1.6",
     "consola": "^3.2.3",
+    "js-yaml": "^4.1.0",
     "mdbox": "^0.1.1"
   },
   "devDependencies": {
     "@biomejs/biome": "^1.9.4",
     "@changesets/cli": "^2.27.10",
     "@qingshaner/eslint-config": "^0.8.0",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^22.10.1",
     "@vitest/coverage-v8": "^2.1.6",
     "eslint": "^9.16.0",
-    "jiti": "^2.4.1",
     "lint-staged": "^15.2.10",
     "simple-git-hooks": "^2.11.1",
     "typescript": "^5.7.2",
