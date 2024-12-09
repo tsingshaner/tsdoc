@@ -1,34 +1,69 @@
-import { DocNode, type DocNodeManager, type IDocNodeDefinition, type IDocNodeParameters } from '@microsoft/tsdoc'
+import { DocNodeKind, type DocNodeManager } from '@microsoft/tsdoc'
 
 import { name } from '../../package.json'
-import { CustomDocNodeKind, customNode, kindGetter } from './kinds'
+import {
+  CustomDocNodeKind,
+  DocBreadcrumb,
+  DocEmphasisSpan,
+  DocFrontMatter,
+  DocHeading,
+  DocNoteBox,
+  DocTable,
+  DocTableRow
+} from './custom-nodes'
 
-export interface IDocHeadingParameters extends IDocNodeParameters {
-  level?: number
-  title: string
+export {
+  CustomDocNodeKind,
+  DocBreadcrumb,
+  DocEmphasisSpan,
+  DocFrontMatter,
+  DocHeading,
+  DocNoteBox,
+  DocTable,
+  DocTableRow
 }
-
-@customNode(CustomDocNodeKind.heading)
-class DocHeading extends DocNode {
-  static readonly definition: IDocNodeDefinition
-  @kindGetter kind!: string
-
-  readonly level: number
-  readonly title: string
-
-  constructor(params: IDocHeadingParameters) {
-    super(params)
-
-    this.title = params.title
-    this.level = params.level ?? 2
-  }
-}
-
-const registerDocNodes = <T extends Pick<DocNodeManager, 'registerAllowableChildren' | 'registerDocNodes'>>(
+/**
+ * Register all custom nodes to the manager
+ * @param manager - A DocNodeManager instance.
+ * @example
+ * ```ts
+ * const configuration = new TSDocConfiguration()
+ * registerDocNodes(configuration.docNodeManager)
+ * ```
+ */
+export const registerDocNodes = <T extends Pick<DocNodeManager, 'registerAllowableChildren' | 'registerDocNodes'>>(
   manager: T
 ) => {
-  manager.registerDocNodes(name, [DocHeading.definition])
+  const nodes = [DocHeading, DocFrontMatter, DocEmphasisSpan, DocTable, DocBreadcrumb, DocNoteBox, DocTableRow]
+
+  manager.registerDocNodes(
+    name,
+    nodes.map((node) => node.definition)
+  )
+
+  manager.registerAllowableChildren(
+    DocNodeKind.Section,
+    Object.values(CustomDocNodeKind).filter((x) => x !== CustomDocNodeKind.EmphasisSpan)
+  )
+  manager.registerAllowableChildren(DocNodeKind.Section, [DocNodeKind.Block])
+  manager.registerAllowableChildren(DocNodeKind.Paragraph, [CustomDocNodeKind.EmphasisSpan])
+  manager.registerAllowableChildren(CustomDocNodeKind.NoteBox, [
+    DocNodeKind.FencedCode,
+    DocNodeKind.Paragraph,
+    DocNodeKind.HtmlStartTag,
+    DocNodeKind.HtmlEndTag
+  ])
+  manager.registerAllowableChildren(CustomDocNodeKind.TableRow, [DocNodeKind.Paragraph])
+  manager.registerAllowableChildren(CustomDocNodeKind.EmphasisSpan, [DocNodeKind.PlainText, DocNodeKind.SoftBreak])
 }
 
-export { DocHeading }
-export { CustomDocNodeKind, customNode, registerDocNodes }
+export type * from './custom-nodes'
+export { customNode, kindGetter } from './decorator'
+export {
+  appendNodesToContainer,
+  buildCodeSpanNode,
+  buildCommaNode,
+  buildExcerptTokenWithHyperLink,
+  docBlockFilter,
+  type DocNodeBuilder
+} from './utils'

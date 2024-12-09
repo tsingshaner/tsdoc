@@ -1,13 +1,25 @@
 import type { DocNode, DocNodeConstructor, IDocNodeDefinition } from '@microsoft/tsdoc'
 
-const scope = 'qingshaner_'
-export const CustomDocNodeKind = {
-  /** Title: `## title` */
-  heading: `${scope}Heading`
-} as const
-
 type CustomNode = { definition: IDocNodeDefinition } & typeof DocNode
 type CustomNodeDecorator<C extends CustomNode> = (value: C, context: ClassDecoratorContext<C>) => void
+/**
+ * The `customNode` decorator is used to define a custom DocNode class.
+ * @param docNodeKind - A unique string that identifies the custom node kind.
+ * @example
+ * ```ts
+ * @customNode('note_node')
+ * class DocNote extends DocNode {
+ *   // optional, but recommended
+ *   static readonly definition: IDocNodeDefinition
+ *   @kindGetter kind!: string
+ *
+ *   constructor(params: IDocNoteParameters) {
+ *     super(params)
+ *     // ...
+ *   }
+ * }
+ * ```
+ */
 export const customNode = <T extends CustomNode>(docNodeKind: string): CustomNodeDecorator<T> => {
   return (value, ctx) => {
     if (ctx.kind !== 'class') {

@@ -1,9 +1,13 @@
 import {
+  ApiAbstractMixin,
   ApiDeclaredItem,
+  ApiInitializerMixin,
   type ApiItem,
   ApiItemKind,
   type ApiModel,
+  ApiOptionalMixin,
   ApiParameterListMixin,
+  type Excerpt,
   type ExcerptToken,
   ExcerptTokenKind
 } from '@microsoft/api-extractor-model'
@@ -67,3 +71,19 @@ export const getExcerptTokenHyperLink = (model: ApiModel, token: ExcerptToken): 
   const referenceApiItem = getReferenceApiItem(model, token)
   return referenceApiItem === undefined ? undefined : getFilenameFormApiItem(referenceApiItem)
 }
+
+export const getConciseSignature = (apiItem: ApiItem): string => {
+  if (ApiParameterListMixin.isBaseClassOf(apiItem)) {
+    return `${apiItem.displayName}(${apiItem.parameters.map((x) => x.name).join(', ')})`
+  }
+  return apiItem.displayName
+}
+
+export const isOptional = (apiItem: ApiItem): apiItem is ApiOptionalMixin =>
+  ApiOptionalMixin.isBaseClassOf(apiItem) && apiItem.isOptional
+
+export const isAbstract = (apiItem: ApiItem): apiItem is ApiAbstractMixin =>
+  ApiAbstractMixin.isBaseClassOf(apiItem) && apiItem.isAbstract
+
+export const isInitializer = (apiItem: ApiItem): apiItem is { initializerExcerpt: Excerpt } & ApiInitializerMixin =>
+  ApiInitializerMixin.isBaseClassOf(apiItem) && apiItem.initializerExcerpt !== undefined
