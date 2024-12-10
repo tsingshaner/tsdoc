@@ -11,6 +11,8 @@ import {
 
 import { customNode, kindGetter } from './decorator'
 
+import type { DocNodeBuilder } from './utils'
+
 const scope = 'Qingshaner'
 export const CustomDocNodeKind = {
   /** Breadcrumb for doc path */
@@ -100,6 +102,10 @@ class DocTable extends DocNode {
 
   addRow(nodes: DocParagraph[]) {
     this.rows.push(new DocTableRow({ configuration: this.configuration, nodes }))
+  }
+
+  addRowFromBuilders(builders: DocNodeBuilder<DocParagraph>[]) {
+    this.addRow(builders.map((fn) => fn(this.configuration)))
   }
 
   /** {@link IDocTableParameters.columns} */

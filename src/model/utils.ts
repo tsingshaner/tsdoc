@@ -7,6 +7,7 @@ import {
   type ApiModel,
   ApiOptionalMixin,
   ApiParameterListMixin,
+  ApiPropertyItem,
   type Excerpt,
   type ExcerptToken,
   ExcerptTokenKind
@@ -87,3 +88,6 @@ export const isAbstract = (apiItem: ApiItem): apiItem is ApiAbstractMixin =>
 
 export const isInitializer = (apiItem: ApiItem): apiItem is { initializerExcerpt: Excerpt } & ApiInitializerMixin =>
   ApiInitializerMixin.isBaseClassOf(apiItem) && apiItem.initializerExcerpt !== undefined
+
+export const isEventProperty = (apiItem: ApiItem): apiItem is { isEventProperty: true } & ApiPropertyItem =>
+  apiItem instanceof ApiPropertyItem && apiItem.isEventProperty
