@@ -7,7 +7,7 @@ import {
   type TSDocConfiguration
 } from '@microsoft/tsdoc'
 
-import type { ApiModel, ExcerptToken } from '@microsoft/api-extractor-model'
+import type { ApiModel, Excerpt, ExcerptToken } from '@microsoft/api-extractor-model'
 
 import { getExcerptTokenHyperLink } from '../model'
 
@@ -48,5 +48,15 @@ export const buildExcerptTokenWithHyperLink = (
   return new DocPlainText({ configuration, text: unwrappedTokenText })
 }
 
+export const buildExcerptWithHyperLinks = (excerpt: Excerpt, model: ApiModel, configuration: TSDocConfiguration) => {
+  return excerpt.tokens.map((token) => buildExcerptTokenWithHyperLink(model, token, configuration))
+}
+
+/**
+ * Filter docBlocks by tag name.
+ * @param docBlocks - DocBlock instance array to filter.
+ * @param tagNameWithUpperCase - UpperCase Tag name to filter, e.g. `PARAM`.
+ * @returns
+ */
 export const docBlockFilter = (docBlocks: DocBlock[] | readonly DocBlock[], tagNameWithUpperCase: string): DocBlock[] =>
   docBlocks.filter((b) => b.blockTag.tagNameWithUpperCase === tagNameWithUpperCase)
