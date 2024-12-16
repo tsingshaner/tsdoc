@@ -1,6 +1,7 @@
 import {
   ApiAbstractMixin,
   ApiDeclaredItem,
+  ApiDocumentedItem,
   ApiInitializerMixin,
   type ApiItem,
   ApiItemKind,
@@ -8,10 +9,14 @@ import {
   ApiOptionalMixin,
   ApiParameterListMixin,
   ApiPropertyItem,
+  ApiReleaseTagMixin,
   type Excerpt,
   type ExcerptToken,
-  ExcerptTokenKind
+  ExcerptTokenKind,
+  ReleaseTag
 } from '@microsoft/api-extractor-model'
+
+import type { DocComment } from '@microsoft/tsdoc'
 
 import { encodeFilename, getUnscopedPackageName } from '../utils'
 
@@ -27,6 +32,17 @@ export const getFilenameFormApiItem = (item: ApiItem): string => {
 
   let baseName = ''
   for (const hierarchyItem of item.getHierarchy()) {
+    switch (hierarchyItem.kind) {
+      case ApiItemKind.EntryPoint:
+      case ApiItemKind.EnumMember:
+      case ApiItemKind.Model:
+        continue
+      case ApiItemKind.Package: {
+        baseName = encodeFilename(getUnscopedPackageName(hierarchyItem.displayName))
+        continue
+      }
+    }
+
     // For overloaded methods, add a suffix such as "MyClass.myMethod_2".
     let qualifiedName: string = encodeFilename(hierarchyItem.displayName)
     if (ApiParameterListMixin.isBaseClassOf(hierarchyItem) && hierarchyItem.overloadIndex > 1) {
@@ -35,17 +51,7 @@ export const getFilenameFormApiItem = (item: ApiItem): string => {
       qualifiedName += `_${hierarchyItem.overloadIndex - 1}`
     }
 
-    switch (hierarchyItem.kind) {
-      case ApiItemKind.EntryPoint:
-      case ApiItemKind.EnumMember:
-      case ApiItemKind.Model:
-        break
-      case ApiItemKind.Package:
-        baseName = encodeFilename(getUnscopedPackageName(hierarchyItem.displayName))
-        break
-      default:
-        baseName += `.${qualifiedName}`
-    }
+    baseName += `.${qualifiedName}`
   }
 
   return baseName
@@ -80,6 +86,10 @@ export const getConciseSignature = (apiItem: ApiItem): string => {
   return apiItem.displayName
 }
 
+export const getReleaseTag = (apiItem: ApiItem): ReleaseTag => {
+  return ApiReleaseTagMixin.isBaseClassOf(apiItem) ? apiItem.releaseTag : ReleaseTag.None
+}
+
 export const isOptional = (apiItem: ApiItem): apiItem is ApiOptionalMixin =>
   ApiOptionalMixin.isBaseClassOf(apiItem) && apiItem.isOptional
 
@@ -91,3 +101,6 @@ export const isInitializer = (apiItem: ApiItem): apiItem is { initializerExcerpt
 
 export const isEventProperty = (apiItem: ApiItem): apiItem is { isEventProperty: true } & ApiPropertyItem =>
   apiItem instanceof ApiPropertyItem && apiItem.isEventProperty
+
+export const hasTsdocComment = (apiItem?: ApiItem): apiItem is { tsdocComment: DocComment } & ApiDocumentedItem =>
+  apiItem !== undefined && apiItem instanceof ApiDocumentedItem && apiItem.tsdocComment !== undefined

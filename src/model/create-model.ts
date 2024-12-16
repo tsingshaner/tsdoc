@@ -1,10 +1,12 @@
 import { glob } from 'node:fs/promises'
 import { join } from 'node:path'
 
-import { ApiDocumentedItem, type ApiItem, ApiItemContainerMixin, ApiModel } from '@microsoft/api-extractor-model'
+import { type ApiItem, ApiItemContainerMixin, ApiModel } from '@microsoft/api-extractor-model'
 import consola from 'consola'
 
 import type { DocComment } from '@microsoft/tsdoc'
+
+import { hasTsdocComment } from './utils'
 
 const copyInheritedDocs = (targetDocComment: DocComment, sourceDocComment: DocComment) => {
   targetDocComment.summarySection = sourceDocComment.summarySection
@@ -23,17 +25,13 @@ const copyInheritedDocs = (targetDocComment: DocComment, sourceDocComment: DocCo
 }
 
 const applyInheritDoc = (apiItem: ApiItem, apiModel: ApiModel) => {
-  if (apiItem instanceof ApiDocumentedItem && apiItem.tsdocComment) {
+  if (hasTsdocComment(apiItem)) {
     const inheritDocTag = apiItem.tsdocComment.inheritDocTag
     if (inheritDocTag?.declarationReference) {
       const result = apiModel.resolveDeclarationReference(inheritDocTag.declarationReference, apiItem)
       if (result.errorMessage) {
         consola.warn(`Unresolved @inheritDoc tag for ${apiItem.displayName}: ${result.errorMessage}`)
-      } else if (
-        result.resolvedApiItem instanceof ApiDocumentedItem &&
-        result.resolvedApiItem.tsdocComment &&
-        result.resolvedApiItem !== apiItem
-      ) {
+      } else if (hasTsdocComment(result.resolvedApiItem) && result.resolvedApiItem !== apiItem) {
         copyInheritedDocs(apiItem.tsdocComment, result.resolvedApiItem.tsdocComment)
       }
     }

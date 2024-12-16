@@ -14,7 +14,6 @@ export default defineConfig({
     lib: {
       entry: {
         cli: resolve(root, 'src/cli.ts'),
-
         ...(isDev ? {} : { index: resolve(root, 'src/index.ts') })
       },
       formats: ['es']
@@ -35,7 +34,7 @@ export default defineConfig({
   plugins: [
     !isDev &&
       dts({
-        exclude: ['test/**'],
+        exclude: ['test/**', '**/*.test.ts'],
         rollupConfig: {
           apiReport: {
             enabled: true,

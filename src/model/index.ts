@@ -1,2 +1,9 @@
 export { createApiModel } from './create-model'
-export { getConciseSignature, getExcerptTokenHyperLink, getFilenameFormApiItem, getReferenceApiItem } from './utils'
+export {
+  getConciseSignature,
+  getExcerptTokenHyperLink,
+  getFilenameFormApiItem,
+  getReferenceApiItem,
+  getReleaseTag,
+  getSourceFileFromApiItem
+} from './utils'
