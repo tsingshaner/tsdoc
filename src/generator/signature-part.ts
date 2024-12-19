@@ -1,17 +1,13 @@
-import {
-  ApiClass,
-  ApiDeclaredItem,
-  ApiInterface,
-  type ApiItem,
-  ApiTypeAlias,
-  type Excerpt
-} from '@microsoft/api-extractor-model'
+import { ApiClass, ApiDeclaredItem, ApiInterface, ApiTypeAlias } from '@microsoft/api-extractor-model'
 import { DocFencedCode, type DocNode, DocParagraph, DocSection } from '@microsoft/tsdoc'
+
+import type { ApiItem, Excerpt } from '@microsoft/api-extractor-model'
 
 import { getReferenceApiItem } from '../model'
 import { buildCommaNode, buildExcerptTokenWithHyperLink } from '../nodes'
-import { buildExcerptWithHyperLinks } from '../nodes/utils'
+import { buildExcerptWithHyperLinks } from '../nodes'
 
+import type { ArticlePart } from '../nodes/custom-nodes/article'
 import type { GeneratorContext } from './types'
 
 class SectionBuilder {
@@ -35,7 +31,7 @@ class SectionBuilder {
 }
 
 /** 类型签名片段 */
-export interface SignaturePart {
+export interface SignaturePart extends ArticlePart {
   /** 继承的类 */
   extends?: DocSection
   /** 继承的类型 */
