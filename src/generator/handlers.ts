@@ -1,20 +1,8 @@
-import {
-  ApiClass,
-  ApiDeclaredItem,
-  ApiInterface,
-  type ApiItem,
-  ApiItemKind,
-  ApiTypeAlias,
-  type Excerpt,
-  type ReleaseTag
-} from '@microsoft/api-extractor-model'
-import { DocFencedCode, type DocNode, DocParagraph, DocSection, type TSDocConfiguration } from '@microsoft/tsdoc'
+import { type ApiItem, ApiItemKind, type ReleaseTag } from '@microsoft/api-extractor-model'
 
-import { getFilenameFormApiItem, getReferenceApiItem, getReleaseTag } from '../model'
-import { buildCommaNode, buildExcerptTokenWithHyperLink, buildExcerptWithHyperLinks } from '../nodes/utils'
+import { getFilenameFormApiItem, getReleaseTag, getSourceFileFromApiItem } from '../model'
 
-import type { DocNodeBuilder } from '../nodes'
-import type { GeneratorContext } from './types'
+import type { SourceURL } from '../model/utils'
 
 /** 面包屑链接 */
 interface BreadcrumbLink {
@@ -28,7 +16,7 @@ interface BreadcrumbLink {
  * @param api - 文档 api model
  */
 const genBreadcrumbLinks = (api: ApiItem): BreadcrumbLink[] => {
-  const breadcrumb: BreadcrumbLink[] = [{ href: getFilenameFormApiItem(api), text: 'Home' }]
+  const breadcrumb: BreadcrumbLink[] = [{ href: 'index', text: 'Home' }]
 
   for (const hierarchyItem of api.getHierarchy()) {
     switch (hierarchyItem.kind) {
@@ -60,8 +48,8 @@ interface FrontMatter extends Record<string | symbol, unknown> {
    * @remarks — If called on an ApiEntrypoint, ApiPackage, or ApiModel item, the result is an empty string.
    */
   scopedName: string
-  /** 源代码位置, 需要自行转换所需的源文件位置, e.g. "index.d.ts" */
-  source: string
+  /** 源代码位置 */
+  source?: SourceURL
 }
 /**
  * 生成文档默认元数据
@@ -75,7 +63,7 @@ const genArticleFrontMatter = (api: ApiItem): FrontMatter => {
     kind: api.kind,
     releaseTag: getReleaseTag(api),
     scopedName: api.getScopedNameWithinPackage(),
-    source: getFilenameFormApiItem(api)
+    source: getSourceFileFromApiItem(api)
   }
 }
 

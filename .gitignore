@@ -4,6 +4,8 @@ cache
 .temp
 coverage
 node_modules
+docs
+markdown
 
 .eslintcache
 .changeset/README.md

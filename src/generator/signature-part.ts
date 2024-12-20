@@ -7,8 +7,7 @@ import { getReferenceApiItem } from '../model'
 import { buildCommaNode, buildExcerptTokenWithHyperLink } from '../nodes'
 import { buildExcerptWithHyperLinks } from '../nodes'
 
-import type { ArticlePart } from '../nodes/custom-nodes/article'
-import type { GeneratorContext } from './types'
+import type { GeneratorContext, SignaturePart } from './types'
 
 class SectionBuilder {
   #needComma = false
@@ -30,19 +29,6 @@ class SectionBuilder {
   }
 }
 
-/** 类型签名片段 */
-export interface SignaturePart extends ArticlePart {
-  /** 继承的类 */
-  extends?: DocSection
-  /** 继承的类型 */
-  extendTypes?: DocSection
-  /** 实现的接口 */
-  implements?: DocSection
-  /** 类型别名引用 */
-  references?: DocSection
-  /** 类型声明 */
-  signature: DocSection
-}
 /**
  * 生成类型签名片段
  * @param api

@@ -4,13 +4,14 @@ import type { ApiItem } from '@microsoft/api-extractor-model'
 
 import { hasTsdocComment } from '../model/utils'
 import { docBlockFilter } from '../nodes'
-import { type ArticlePart, DocArticle } from '../nodes/custom-nodes/article'
+import { DocArticle } from '../nodes/custom-nodes/article'
 import { FrontMatterMeta, StandardPart } from './constants'
 import { genArticleFrontMatter } from './handlers'
+import { genRemarkPart } from './remark-part'
 import { genSignaturePart } from './signature-part'
 import { genTablesPart } from './table-part'
 
-import type { GeneratorContext, GeneratorOptions, HandlerParameters } from './types'
+import type { GeneratorContext, GeneratorOptions, HandlerParameters, StandardParts } from './types'
 
 const defaultArticleInitializer: GeneratorOptions['articleInitializer'] = ({ tsdocConfiguration }, api) =>
   new DocArticle({
@@ -25,9 +26,11 @@ const defaultArticleGenerator = (...[ctx, api, options]: HandlerParameters) => {
   const configuration = ctx.tsdocConfiguration
   const subApis: ApiItem[] = []
 
-  const parts: ArticlePart = {}
+  const parts: StandardParts = {}
 
   if (hasTsdocComment(api)) {
+    parts.remarks = genRemarkPart(ctx, api)
+
     const decorators = docBlockFilter(api.tsdocComment.customBlocks, StandardTags.decorator.tagNameWithUpperCase)
     if (decorators.length > 0) {
       parts.decorators = new DocSection({ configuration }, decorators)

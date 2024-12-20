@@ -11,6 +11,7 @@ import {
   DocTable,
   DocTableRow
 } from './custom-nodes'
+import { DocArticle } from './custom-nodes/article'
 
 export {
   CustomDocNodeKind,
@@ -34,7 +35,16 @@ export {
 export const registerDocNodes = <T extends Pick<DocNodeManager, 'registerAllowableChildren' | 'registerDocNodes'>>(
   manager: T
 ) => {
-  const nodes = [DocHeading, DocFrontMatter, DocEmphasisSpan, DocTable, DocBreadcrumb, DocNoteBox, DocTableRow]
+  const nodes = [
+    DocHeading,
+    DocFrontMatter,
+    DocEmphasisSpan,
+    DocTable,
+    DocBreadcrumb,
+    DocNoteBox,
+    DocTableRow,
+    DocArticle
+  ]
 
   manager.registerDocNodes(
     name,
@@ -45,6 +55,13 @@ export const registerDocNodes = <T extends Pick<DocNodeManager, 'registerAllowab
     DocNodeKind.Section,
     Object.values(CustomDocNodeKind).filter((x) => x !== CustomDocNodeKind.EmphasisSpan)
   )
+
+  manager.registerAllowableChildren(DocArticle.definition.docNodeKind, [
+    DocNodeKind.FencedCode,
+    DocNodeKind.Paragraph,
+    DocNodeKind.HtmlStartTag,
+    DocNodeKind.HtmlEndTag
+  ])
   manager.registerAllowableChildren(DocNodeKind.Section, [DocNodeKind.Block])
   manager.registerAllowableChildren(DocNodeKind.Paragraph, [CustomDocNodeKind.EmphasisSpan])
   manager.registerAllowableChildren(CustomDocNodeKind.NoteBox, [
@@ -64,6 +81,7 @@ export {
   buildCodeSpanNode,
   buildCommaNode,
   buildExcerptTokenWithHyperLink,
+  buildExcerptWithHyperLinks,
   docBlockFilter,
   type DocNodeBuilder
 } from './utils'

@@ -5,12 +5,7 @@ import type { ApiItem } from '@microsoft/api-extractor-model'
 import { hasTsdocComment } from '../model/utils'
 import { docBlockFilter } from '../nodes'
 
-import type { GeneratorContext } from './types'
-
-interface RemarksPart {
-  examples?: DocSection[]
-  remarks?: DocSection
-}
+import type { GeneratorContext, RemarksPart } from './types'
 
 export const genRemarkPart = (ctx: GeneratorContext, api: ApiItem): RemarksPart | undefined => {
   if (!hasTsdocComment(api)) {
