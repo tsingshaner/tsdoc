@@ -33,6 +33,7 @@ export type { ArticleGenerator, GeneratorContext, GeneratorOptions, HandlerParam
 export interface RemarksPart extends ArticlePart {
   examples?: DocSection[]
   remarks?: DocSection
+  summary: DocSection
 }
 
 /** 类型签名片段 */
@@ -49,10 +50,73 @@ export interface SignaturePart extends ArticlePart {
   signature: DocSection
 }
 
+type TableCells<T extends string> = Record<'description' | T, DocSection[]>
+
+interface ClassTablePart extends ArticlePart {
+  class: {
+    constructors: TableCells<'constructors' | 'modifiers'>
+    events: TableCells<'modifiers' | 'property' | 'type'>
+    methods: TableCells<'method' | 'modifiers'>
+    properties: TableCells<'modifiers' | 'property' | 'type'>
+  }
+}
+
+interface ParameterTablePart extends ArticlePart {
+  parameter: {
+    parameters: TableCells<'parameter' | 'type'>
+    returns?: DocSection
+    throws?: DocSection
+  }
+}
+
+interface EnumTablePart extends ArticlePart {
+  enums: TableCells<'member' | 'value'>
+}
+
+interface InterfaceTablePart extends ArticlePart {
+  interface: {
+    events: TableCells<'modifiers' | 'property' | 'type'>
+    methods: TableCells<'method'>
+    properties: TableCells<'modifiers' | 'property' | 'type'>
+  }
+}
+
+interface PackageOrNamespaceTablePart extends ArticlePart {
+  pkgOrNamespace: {
+    abstractClasses: TableCells<'abstractClass'>
+    classes: TableCells<'class'>
+    enums: TableCells<'enum'>
+    functions: TableCells<'function'>
+    interfaces: TableCells<'interface'>
+    namespaces: TableCells<'namespace'>
+    typeAliases: TableCells<'typeAlias'>
+    variables: TableCells<'variable'>
+  }
+}
+
+interface ModelTablePart extends ArticlePart {
+  models: TableCells<'package'>
+}
+
 export interface StandardParts extends ArticlePart {
   decorators?: DocSection
   deprecated?: DocSection
   remarks?: RemarksPart
   signature?: SignaturePart
-  // tables: {}
+  tables:
+    | ClassTablePart
+    | EnumTablePart
+    | InterfaceTablePart
+    | ModelTablePart
+    | PackageOrNamespaceTablePart
+    | ParameterTablePart
+}
+
+export type {
+  ClassTablePart,
+  EnumTablePart,
+  InterfaceTablePart,
+  ModelTablePart,
+  PackageOrNamespaceTablePart,
+  ParameterTablePart
 }

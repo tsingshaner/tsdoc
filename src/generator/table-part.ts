@@ -28,7 +28,6 @@ import { hasTsdocComment, isAbstract } from '../model'
 import {
   buildCodeSpanNode,
   buildCommaNode,
-  buildExcerptTokenWithHyperLink,
   buildExcerptWithHyperLinks,
   docBlockFilter,
   DocEmphasisSpan,
@@ -36,54 +35,16 @@ import {
 } from '../nodes'
 import { MaybeIncomplete } from './constants'
 
-import type { ArticlePart } from '../nodes/custom-nodes/article'
-import type { GenerateResult, GeneratorContext } from './types'
-
-type TableCells<T extends string> = Record<'description' | T, DocSection[]>
-
-interface ClassTablePart extends ArticlePart {
-  class: {
-    constructors: TableCells<'constructors' | 'modifiers'>
-    events: TableCells<'modifiers' | 'property' | 'type'>
-    methods: TableCells<'method' | 'modifiers'>
-    properties: TableCells<'modifiers' | 'property' | 'type'>
-  }
-}
-
-interface ParameterTablePart extends ArticlePart {
-  parameters: TableCells<'parameter' | 'type'>
-  returns?: DocSection
-  throws?: DocSection
-}
-
-interface EnumTablePart extends ArticlePart {
-  enums: TableCells<'member' | 'value'>
-}
-
-interface InterfaceTablePart extends ArticlePart {
-  interface: {
-    events: TableCells<'modifiers' | 'property' | 'type'>
-    methods: TableCells<'method'>
-    properties: TableCells<'modifiers' | 'property' | 'type'>
-  }
-}
-
-interface PackageOrNamespaceTablePart extends ArticlePart {
-  pkgOrNamespace: {
-    abstractClasses: TableCells<'abstractClass'>
-    classes: TableCells<'class'>
-    enums: TableCells<'enum'>
-    functions: TableCells<'function'>
-    interfaces: TableCells<'interface'>
-    namespaces: TableCells<'namespace'>
-    typeAliases: TableCells<'typeAlias'>
-    variables: TableCells<'variable'>
-  }
-}
-
-interface ModelTablePart extends ArticlePart {
-  models: TableCells<'package'>
-}
+import type {
+  ClassTablePart,
+  EnumTablePart,
+  GenerateResult,
+  GeneratorContext,
+  InterfaceTablePart,
+  ModelTablePart,
+  PackageOrNamespaceTablePart,
+  ParameterTablePart
+} from './types'
 
 type CellNodesBuilder = (configuration: TSDocConfiguration) => DocNode[]
 type DocNodesOrBuilder = CellNodesBuilder | DocNode[]
@@ -106,9 +67,18 @@ const genTitleCell = (api: ApiItem): CellNodesBuilder => {
   ]
 }
 
+const genOptionalNodes = (api: ApiItem, configuration: TSDocConfiguration): DocNode[] => {
+  return isOptional(api)
+    ? [
+        new DocEmphasisSpan({ configuration, italic: true }, [new DocPlainText({ configuration, text: '(Optional)' })]),
+        new DocPlainText({ configuration, text: ' ' })
+      ]
+    : []
+}
+
 const genDescriptionCell = (api: ApiItem, isInherited = false): CellNodesBuilder => {
   return (configuration) => {
-    const paragraph = new DocParagraph({ configuration }, [])
+    const paragraph = new DocParagraph({ configuration }, genOptionalNodes(api, configuration))
     const softBreak = new DocPlainText({ configuration, text: ' ' })
     const nodes: DocNode[] = [paragraph]
     const releaseTag = getReleaseTag(api)
@@ -121,13 +91,6 @@ const genDescriptionCell = (api: ApiItem, isInherited = false): CellNodesBuilder
             text: `(${releaseTag === ReleaseTag.Alpha ? 'Alpha' : 'Beta'})`
           })
         ]),
-        softBreak
-      ])
-    }
-
-    if (isOptional(api)) {
-      paragraph.appendNodes([
-        new DocEmphasisSpan({ configuration, italic: true }, [new DocPlainText({ configuration, text: '(Optional)' })]),
         softBreak
       ])
     }
@@ -191,7 +154,7 @@ const genModifiersCell = (api: ApiItem): CellNodesBuilder => {
   }
 }
 
-const genPropertyCell = (ctx: GeneratorContext, api: ApiItem): CellNodesBuilder => {
+const genPropertyTypeCell = (ctx: GeneratorContext, api: ApiItem): CellNodesBuilder => {
   return (configuration) => {
     const paragraph = new DocParagraph({ configuration }, [])
     if (api instanceof ApiPropertyItem) {
@@ -199,9 +162,7 @@ const genPropertyCell = (ctx: GeneratorContext, api: ApiItem): CellNodesBuilder 
       if (!excerpt.text.trim()) {
         paragraph.appendNode(new DocPlainText({ configuration, text: '(not declared)' }))
       } else {
-        paragraph.appendNodes(
-          excerpt.spannedTokens.map((token) => buildExcerptTokenWithHyperLink(ctx.model, token, configuration))
-        )
+        paragraph.appendNodes(buildExcerptWithHyperLinks(excerpt, ctx.model, configuration))
       }
     }
 
@@ -295,8 +256,8 @@ const genClassesTablePart = (ctx: GeneratorContext, apiClass: ApiClass): Generat
         ;(isEventProperty(apiMember) ? tables.events : tables.properties).addRow({
           description: genDescriptionCell(apiMember, isInherited),
           modifiers: genModifiersCell(apiMember),
-          property: genPropertyCell(ctx, apiMember),
-          type: genTitleCell(apiMember)
+          property: genTitleCell(apiMember),
+          type: genPropertyTypeCell(ctx, apiMember)
         })
         break
       }
@@ -336,20 +297,16 @@ const genParameterTable = (
   { model, tsdocConfiguration: configuration }: GeneratorContext,
   api: ApiParameterListMixin
 ): GenerateResult<ParameterTablePart> => {
-  const parametersTable = TableBuilder.fromColumns<ParameterTablePart['parameters']>(
+  const parametersTable = TableBuilder.fromColumns<ParameterTablePart['parameter']['parameters']>(
     ['parameter', 'type'],
     configuration
   )
 
   for (const apiParameter of api.parameters) {
-    const parameterDescription = new DocParagraph({ configuration })
-
-    if (apiParameter.isOptional) {
-      parameterDescription.appendNodes([
-        new DocEmphasisSpan({ configuration, italic: true }, [new DocPlainText({ configuration, text: '(Optional)' })]),
-        new DocPlainText({ configuration, text: ' ' })
-      ])
-    }
+    const parameterDescription = new DocParagraph(
+      { configuration },
+      genOptionalNodes(apiParameter as unknown as ApiItem, configuration)
+    )
 
     for (const node of apiParameter.tsdocParamBlock?.content.nodes ?? []) {
       if ((node.kind as DocNodeKind) === DocNodeKind.Paragraph) {
@@ -359,13 +316,15 @@ const genParameterTable = (
 
     parametersTable.addRow({
       description: [parameterDescription],
-      parameter: [
+      parameter: [new DocParagraph({ configuration }, [new DocPlainText({ configuration, text: apiParameter.name })])],
+      type: [
         new DocParagraph(
           { configuration },
-          buildExcerptWithHyperLinks(apiParameter.parameterTypeExcerpt, model, configuration)
+          apiParameter.parameterTypeExcerpt.isEmpty
+            ? [new DocPlainText({ configuration, text: '(not declared)' })]
+            : buildExcerptWithHyperLinks(apiParameter.parameterTypeExcerpt, model, configuration)
         )
-      ],
-      type: [new DocParagraph({ configuration }, [new DocPlainText({ configuration, text: apiParameter.name })])]
+      ]
     })
   }
 
@@ -373,10 +332,7 @@ const genParameterTable = (
   if (ApiReturnTypeMixin.isBaseClassOf(api)) {
     const returnTypeExcerpt = api.returnTypeExcerpt
     returns.appendNodes([
-      new DocParagraph(
-        { configuration },
-        returnTypeExcerpt.spannedTokens.map((token) => buildExcerptTokenWithHyperLink(model, token, configuration))
-      )
+      new DocParagraph({ configuration }, buildExcerptWithHyperLinks(returnTypeExcerpt, model, configuration))
     ])
 
     if (hasTsdocComment(api) && api.tsdocComment.returnsBlock) {
@@ -386,9 +342,11 @@ const genParameterTable = (
 
   return {
     part: {
-      parameters: parametersTable.tablePart,
-      returns: returns.nodes.length > 0 ? returns : undefined,
-      throws: genThrowsPart(api)?.(configuration)
+      parameter: {
+        parameters: parametersTable.tablePart,
+        returns: returns.nodes.length > 0 ? returns : undefined,
+        throws: genThrowsPart(api)?.(configuration)
+      }
     }
   }
 }
@@ -450,8 +408,8 @@ const genInterfaceTables = (ctx: GeneratorContext, api: ApiInterface): GenerateR
           ;(isEventProperty(apiMember) ? tables.events : tables.properties).addRow({
             description: genDescriptionCell(apiMember, isInherited),
             modifiers: genModifiersCell(apiMember),
-            property: genPropertyCell(ctx, apiMember),
-            type: genTitleCell(apiMember)
+            property: genTitleCell(apiMember),
+            type: genPropertyTypeCell(ctx, apiMember)
           })
         }
         break

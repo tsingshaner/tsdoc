@@ -12,9 +12,11 @@ export const genRemarkPart = (ctx: GeneratorContext, api: ApiItem): RemarksPart 
     return
   }
 
-  const part: RemarksPart = {}
+  const { customBlocks, remarksBlock, summarySection } = api.tsdocComment
+  const part: RemarksPart = {
+    summary: summarySection
+  }
 
-  const { customBlocks, remarksBlock } = api.tsdocComment
   // Write the @remarks block
   if (remarksBlock && remarksBlock.content.nodes.length > 0) {
     part.remarks = new DocSection({ configuration: ctx.tsdocConfiguration }, remarksBlock.content.nodes)
