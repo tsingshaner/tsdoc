@@ -49,7 +49,9 @@ export const buildExcerptTokenWithHyperLink = (
 }
 
 export const buildExcerptWithHyperLinks = (excerpt: Excerpt, model: ApiModel, configuration: TSDocConfiguration) => {
-  return excerpt.tokens.map((token) => buildExcerptTokenWithHyperLink(model, token, configuration))
+  return excerpt.tokens
+    .slice(excerpt.tokenRange.startIndex, excerpt.tokenRange.endIndex)
+    .map((token) => buildExcerptTokenWithHyperLink(model, token, configuration))
 }
 
 /**

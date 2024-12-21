@@ -3,19 +3,16 @@ import {
   ApiDeclaredItem,
   ApiDocumentedItem,
   ApiInitializerMixin,
-  type ApiItem,
   ApiItemKind,
-  type ApiModel,
   ApiOptionalMixin,
   ApiParameterListMixin,
   ApiPropertyItem,
   ApiReleaseTagMixin,
-  type Excerpt,
-  type ExcerptToken,
   ExcerptTokenKind,
   ReleaseTag
 } from '@microsoft/api-extractor-model'
 
+import type { ApiItem, ApiModel, Excerpt, ExcerptToken } from '@microsoft/api-extractor-model'
 import type { DocComment } from '@microsoft/tsdoc'
 
 import { encodeFilename, getUnscopedPackageName } from '../utils'
@@ -57,12 +54,18 @@ export const getFilenameFormApiItem = (item: ApiItem): string => {
   return baseName
 }
 
-export const getSourceFileFromApiItem = (
-  item: ApiItem
-): Record<'fileUrlPath' | 'repositoryURL', string | undefined> | undefined => {
+/** 源代码位置 */
+export interface SourceURL {
+  /** 源代码文件系统位置 e.g. `dist/src/index.d.ts` */
+  fileURLPath?: string
+  /** 源代码远程仓库位置 e.g. `https://github.com/tsingshaner/tsdoc/dist/src/index.d.ts`*/
+  repositoryURL?: string
+}
+
+export const getSourceFileFromApiItem = (item: ApiItem): SourceURL | undefined => {
   if (item instanceof ApiDeclaredItem) {
     return {
-      fileUrlPath: item.fileUrlPath,
+      fileURLPath: item.fileUrlPath,
       repositoryURL: item.sourceLocation.fileUrl
     }
   }
@@ -79,6 +82,7 @@ export const getExcerptTokenHyperLink = (model: ApiModel, token: ExcerptToken): 
   return referenceApiItem === undefined ? undefined : getFilenameFormApiItem(referenceApiItem)
 }
 
+/** 获取 api 签名 */
 export const getConciseSignature = (apiItem: ApiItem): string => {
   if (ApiParameterListMixin.isBaseClassOf(apiItem)) {
     return `${apiItem.displayName}(${apiItem.parameters.map((x) => x.name).join(', ')})`
@@ -90,10 +94,16 @@ export const getReleaseTag = (apiItem: ApiItem): ReleaseTag => {
   return ApiReleaseTagMixin.isBaseClassOf(apiItem) ? apiItem.releaseTag : ReleaseTag.None
 }
 
-export const isOptional = (apiItem: ApiItem): apiItem is ApiOptionalMixin =>
+export const getSourceUrlPath = (apiItem: ApiItem): string | undefined => {
+  if (apiItem instanceof ApiDeclaredItem) {
+    return apiItem.fileUrlPath
+  }
+}
+
+export const isOptional = (apiItem: ApiItem): apiItem is { isOptional: true } & ApiOptionalMixin =>
   ApiOptionalMixin.isBaseClassOf(apiItem) && apiItem.isOptional
 
-export const isAbstract = (apiItem: ApiItem): apiItem is ApiAbstractMixin =>
+export const isAbstract = (apiItem: ApiItem): apiItem is { isAbstract: true } & ApiAbstractMixin =>
   ApiAbstractMixin.isBaseClassOf(apiItem) && apiItem.isAbstract
 
 export const isInitializer = (apiItem: ApiItem): apiItem is { initializerExcerpt: Excerpt } & ApiInitializerMixin =>
