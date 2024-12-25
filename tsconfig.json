@@ -2,7 +2,11 @@
   "compilerOptions": {
     "composite": true,
     "useDefineForClassFields": true,
+    "baseUrl": ".",
     "rootDir": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
     "skipLibCheck": true,
 
     "target": "ESNext",

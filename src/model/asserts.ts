@@ -1,12 +1,15 @@
 import {
   ApiAbstractMixin,
+  ApiDeclaredItem,
   ApiDocumentedItem,
   ApiInitializerMixin,
   type ApiItem,
   ApiOptionalMixin,
+  ApiParameterListMixin,
   ApiPropertyItem,
   ApiProtectedMixin,
   ApiReadonlyMixin,
+  ApiReleaseTagMixin,
   ApiStaticMixin
 } from '@microsoft/api-extractor-model'
 
@@ -16,26 +19,32 @@ type IsRequired<T, K extends keyof T> = Record<
 > &
   T
 
-export const hasTsdocComment = (apiItem?: ApiItem): apiItem is IsRequired<ApiDocumentedItem, 'tsdocComment'> =>
-  apiItem !== undefined && apiItem instanceof ApiDocumentedItem && apiItem.tsdocComment !== undefined
+export const hasTsdocComment = (api?: ApiItem): api is IsRequired<ApiDocumentedItem, 'tsdocComment'> =>
+  api !== undefined && api instanceof ApiDocumentedItem && api.tsdocComment !== undefined
 
-export const isOptional = (apiItem: ApiItem): apiItem is IsRequired<ApiOptionalMixin, 'isOptional'> =>
-  ApiOptionalMixin.isBaseClassOf(apiItem) && apiItem.isOptional
+export const hasReleaseTag = (api: ApiItem): api is ApiReleaseTagMixin => ApiReleaseTagMixin.isBaseClassOf(api)
 
-export const isAbstract = (apiItem: ApiItem): apiItem is IsRequired<ApiAbstractMixin, 'isAbstract'> =>
-  ApiAbstractMixin.isBaseClassOf(apiItem) && apiItem.isAbstract
+export const isOptional = (api: ApiItem): api is IsRequired<ApiOptionalMixin, 'isOptional'> =>
+  ApiOptionalMixin.isBaseClassOf(api) && api.isOptional
 
-export const isInitializer = (apiItem: ApiItem): apiItem is IsRequired<ApiInitializerMixin, 'initializerExcerpt'> =>
-  ApiInitializerMixin.isBaseClassOf(apiItem) && apiItem.initializerExcerpt !== undefined
+export const isAbstract = (api: ApiItem): api is IsRequired<ApiAbstractMixin, 'isAbstract'> =>
+  ApiAbstractMixin.isBaseClassOf(api) && api.isAbstract
 
-export const isEventProperty = (apiItem: ApiItem): apiItem is IsRequired<ApiPropertyItem, 'isEventProperty'> =>
-  apiItem instanceof ApiPropertyItem && apiItem.isEventProperty
+export const isInitializer = (api: ApiItem): api is IsRequired<ApiInitializerMixin, 'initializerExcerpt'> =>
+  ApiInitializerMixin.isBaseClassOf(api) && api.initializerExcerpt !== undefined
 
-export const isProtected = (apiItem: ApiItem): apiItem is IsRequired<ApiProtectedMixin, 'isProtected'> =>
-  ApiProtectedMixin.isBaseClassOf(apiItem) && apiItem.isProtected
+export const isEventProperty = (api: ApiItem): api is IsRequired<ApiPropertyItem, 'isEventProperty'> =>
+  api instanceof ApiPropertyItem && api.isEventProperty
 
-export const isReadonly = (apiItem: ApiItem): apiItem is IsRequired<ApiReadonlyMixin, 'isReadonly'> =>
-  ApiReadonlyMixin.isBaseClassOf(apiItem) && apiItem.isReadonly
+export const isParameterList = (api: ApiItem): api is ApiParameterListMixin => ApiParameterListMixin.isBaseClassOf(api)
 
-export const isStatic = (apiItem: ApiItem): apiItem is IsRequired<ApiStaticMixin, 'isStatic'> =>
-  ApiStaticMixin.isBaseClassOf(apiItem) && apiItem.isStatic
+export const isDeclared = (api: ApiItem): api is ApiDeclaredItem => api instanceof ApiDeclaredItem
+
+export const isProtected = (api: ApiItem): api is IsRequired<ApiProtectedMixin, 'isProtected'> =>
+  ApiProtectedMixin.isBaseClassOf(api) && api.isProtected
+
+export const isReadonly = (api: ApiItem): api is IsRequired<ApiReadonlyMixin, 'isReadonly'> =>
+  ApiReadonlyMixin.isBaseClassOf(api) && api.isReadonly
+
+export const isStatic = (api: ApiItem): api is IsRequired<ApiStaticMixin, 'isStatic'> =>
+  ApiStaticMixin.isBaseClassOf(api) && api.isStatic

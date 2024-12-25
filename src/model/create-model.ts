@@ -6,7 +6,7 @@ import consola from 'consola'
 
 import type { DocComment } from '@microsoft/tsdoc'
 
-import { hasTsdocComment } from './utils'
+import { hasTsdocComment } from './asserts'
 
 const copyInheritedDocs = (targetDocComment: DocComment, sourceDocComment: DocComment) => {
   targetDocComment.summarySection = sourceDocComment.summarySection
@@ -24,7 +24,12 @@ const copyInheritedDocs = (targetDocComment: DocComment, sourceDocComment: DocCo
   targetDocComment.inheritDocTag = undefined
 }
 
-const applyInheritDoc = (apiItem: ApiItem, apiModel: ApiModel) => {
+/**
+ * 将引用的文档覆盖至当前文档。
+ * @param apiItem - 当前文档。
+ * @param apiModel - ApiModel 根实例。
+ */
+export const applyInheritDoc = (apiItem: ApiItem, apiModel: ApiModel) => {
   if (hasTsdocComment(apiItem)) {
     const inheritDocTag = apiItem.tsdocComment.inheritDocTag
     if (inheritDocTag?.declarationReference) {
@@ -43,6 +48,11 @@ const applyInheritDoc = (apiItem: ApiItem, apiModel: ApiModel) => {
   }
 }
 
+/**
+ * 读取 Api 数据文件夹下所有文件, 并返回 ApiModel 实例.
+ * @param folder - Api JSON 数据文件文件夹.
+ * @public
+ */
 export const createApiModel = async (folder: string) => {
   const apiModel = new ApiModel()
   for await (const file of glob(join(folder, '**/*.api.json'))) {

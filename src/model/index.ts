@@ -8,12 +8,14 @@ export {
   isReadonly,
   isStatic
 } from './asserts'
-export { createApiModel } from './create-model'
+export { applyInheritDoc, createApiModel } from './create-model'
 export {
+  getAnchorID,
   getConciseSignature,
   getExcerptTokenHyperLink,
   getFilenameFormApiItem,
   getReferenceApiItem,
   getReleaseTag,
-  getSourceFileFromApiItem
+  getSourceFileFromApiItem,
+  type SourceURL
 } from './utils'

@@ -1,28 +1,16 @@
-import {
-  ApiAbstractMixin,
-  ApiDeclaredItem,
-  ApiDocumentedItem,
-  ApiInitializerMixin,
-  ApiItemKind,
-  ApiOptionalMixin,
-  ApiParameterListMixin,
-  ApiPropertyItem,
-  ApiReleaseTagMixin,
-  ExcerptTokenKind,
-  ReleaseTag
-} from '@microsoft/api-extractor-model'
+import { ApiItemKind, ExcerptTokenKind, ReleaseTag } from '@microsoft/api-extractor-model'
 
-import type { ApiItem, ApiModel, Excerpt, ExcerptToken } from '@microsoft/api-extractor-model'
-import type { DocComment } from '@microsoft/tsdoc'
+import type { ApiItem, ApiModel, ExcerptToken } from '@microsoft/api-extractor-model'
 
 import { encodeFilename, getUnscopedPackageName } from '../utils'
+import { hasReleaseTag, isDeclared, isParameterList } from './asserts'
 
 /**
- *
- * @param item
- * @returns
+ * 获取 ApiItem 的 ID, 可作为文件名.
+ * @param item - `ApiItem` 实例.
+ * @returns 返回 ApiItem 的唯一 ID, e.g. `example-base.version`
  */
-export const getFilenameFormApiItem = (item: ApiItem): string => {
+export const getAnchorID = (item: ApiItem): string => {
   if (item.kind === ApiItemKind.Model) {
     return 'index'
   }
@@ -42,7 +30,7 @@ export const getFilenameFormApiItem = (item: ApiItem): string => {
 
     // For overloaded methods, add a suffix such as "MyClass.myMethod_2".
     let qualifiedName: string = encodeFilename(hierarchyItem.displayName)
-    if (ApiParameterListMixin.isBaseClassOf(hierarchyItem) && hierarchyItem.overloadIndex > 1) {
+    if (isParameterList(hierarchyItem) && hierarchyItem.overloadIndex > 1) {
       // Subtract one for compatibility with earlier releases of API Documenter.
       // (This will get revamped when we fix GitHub issue #1308)
       qualifiedName += `_${hierarchyItem.overloadIndex - 1}`
@@ -51,8 +39,13 @@ export const getFilenameFormApiItem = (item: ApiItem): string => {
     baseName += `.${qualifiedName}`
   }
 
-  return baseName
+  return baseName.toLowerCase()
 }
+
+/**
+ * @deprecated Please use {@link getAnchorID}.
+ */
+export const getFilenameFormApiItem = (item: ApiItem): string => getAnchorID(item)
 
 /** 源代码位置 */
 export interface SourceURL {
@@ -62,8 +55,13 @@ export interface SourceURL {
   repositoryURL?: string
 }
 
+/**
+ * 获取 ApiItem 源代码位置对象。
+ * @remarks
+ * `ApiPackage`, `ApiModel`, `ApiEntryPoint` 返回为 `undefined`。
+ */
 export const getSourceFileFromApiItem = (item: ApiItem): SourceURL | undefined => {
-  if (item instanceof ApiDeclaredItem) {
+  if (isDeclared(item)) {
     return {
       fileURLPath: item.fileUrlPath,
       repositoryURL: item.sourceLocation.fileUrl
@@ -79,38 +77,22 @@ export const getReferenceApiItem = (model: ApiModel, token: ExcerptToken): ApiIt
 
 export const getExcerptTokenHyperLink = (model: ApiModel, token: ExcerptToken): string | undefined => {
   const referenceApiItem = getReferenceApiItem(model, token)
-  return referenceApiItem === undefined ? undefined : getFilenameFormApiItem(referenceApiItem)
+  return referenceApiItem && getAnchorID(referenceApiItem)
 }
 
 /** 获取 api 签名 */
 export const getConciseSignature = (apiItem: ApiItem): string => {
-  if (ApiParameterListMixin.isBaseClassOf(apiItem)) {
+  if (isParameterList(apiItem)) {
     return `${apiItem.displayName}(${apiItem.parameters.map((x) => x.name).join(', ')})`
   }
   return apiItem.displayName
 }
 
-export const getReleaseTag = (apiItem: ApiItem): ReleaseTag => {
-  return ApiReleaseTagMixin.isBaseClassOf(apiItem) ? apiItem.releaseTag : ReleaseTag.None
-}
-
-export const getSourceUrlPath = (apiItem: ApiItem): string | undefined => {
-  if (apiItem instanceof ApiDeclaredItem) {
-    return apiItem.fileUrlPath
-  }
-}
-
-export const isOptional = (apiItem: ApiItem): apiItem is { isOptional: true } & ApiOptionalMixin =>
-  ApiOptionalMixin.isBaseClassOf(apiItem) && apiItem.isOptional
-
-export const isAbstract = (apiItem: ApiItem): apiItem is { isAbstract: true } & ApiAbstractMixin =>
-  ApiAbstractMixin.isBaseClassOf(apiItem) && apiItem.isAbstract
-
-export const isInitializer = (apiItem: ApiItem): apiItem is { initializerExcerpt: Excerpt } & ApiInitializerMixin =>
-  ApiInitializerMixin.isBaseClassOf(apiItem) && apiItem.initializerExcerpt !== undefined
-
-export const isEventProperty = (apiItem: ApiItem): apiItem is { isEventProperty: true } & ApiPropertyItem =>
-  apiItem instanceof ApiPropertyItem && apiItem.isEventProperty
-
-export const hasTsdocComment = (apiItem?: ApiItem): apiItem is { tsdocComment: DocComment } & ApiDocumentedItem =>
-  apiItem !== undefined && apiItem instanceof ApiDocumentedItem && apiItem.tsdocComment !== undefined
+/**
+ * 获取版本标签
+ * @param apiItem - 待查看的 `ApiItem`.
+ * @returns ApiItem 若没有定义版本标签则默认返回 `ReleaseTag.None`.
+ * @public
+ */
+export const getReleaseTag = (apiItem: ApiItem): ReleaseTag =>
+  hasReleaseTag(apiItem) ? apiItem.releaseTag : ReleaseTag.None
