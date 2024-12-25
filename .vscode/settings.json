@@ -45,5 +45,5 @@
   "[html]": {
     "editor.formatOnSave": false
   },
-  "cSpell.words": ["citty"]
+  "cSpell.words": ["citty", "mdbox"]
 }

@@ -1,0 +1,12 @@
+{
+  "name": "@qingshaner/example-base",
+  "type": "module",
+  "private": "true",
+  "description": "Example for base tsdoc.",
+  "scripts": {
+    "build": "vite build"
+  },
+  "devDependencies": {
+    "lit": "3.2.1"
+  }
+}
