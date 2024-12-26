@@ -7,4 +7,5 @@
 export * from './classes'
 export * from './enums'
 export * from './functions'
+export type * from './types'
 export * from './variables'

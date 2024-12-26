@@ -1,3 +1,5 @@
+import type { ReleaseTag } from './enums'
+
 /**
  * A rgb color.
  * @example
@@ -15,9 +17,18 @@
 export type RgbColor = `#${string}` | number
 
 export interface DocNode {
-  color: RgbColor
   kind: string
   nodes: DocNode[]
+}
+
+export interface DocTag extends DocNode {
+  color: RgbColor
+}
+
+export type Release = ReleaseTag
+
+export interface DocReleaseTag extends DocTag {
+  release: Release
 }
 
 export type DocArticle = {

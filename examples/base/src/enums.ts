@@ -11,3 +11,10 @@ export enum CustomNodeKind {
   /** An article toc node.  */
   DocToc = 'toc'
 }
+
+export enum ReleaseTag {
+  Alpha = 0,
+  Beta = 1,
+  Deprecated = 2,
+  Stable = 3
+}

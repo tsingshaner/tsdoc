@@ -9,13 +9,13 @@ import { getAnchorID } from './utils'
 describe('Some api model utilities', (test) => {
   test('Get release tag', ({ expect }) => {
     expect(getReleaseTag(model)).toEqual(ReleaseTag.None)
-    expect(getReleaseTag(baseItems.variable)).toEqual(ReleaseTag.Public)
+    expect(getReleaseTag(baseItems.variables.version)).toEqual(ReleaseTag.Public)
   })
 
   test('Get api source file url', ({ expect }) => {
-    expect(baseItems.variable).instanceOf(ApiVariable)
+    expect(baseItems.variables.version).instanceOf(ApiVariable)
 
-    const source = getSourceFileFromApiItem(baseItems.variable)
+    const source = getSourceFileFromApiItem(baseItems.variables.version)
     expect(source).toMatchInlineSnapshot(`
       {
         "fileURLPath": "dist/src/variables.d.ts",
@@ -25,6 +25,6 @@ describe('Some api model utilities', (test) => {
   })
 
   test('Should get ApiItem id', ({ expect }) => {
-    expect(getAnchorID(baseItems.variable)).toMatchInlineSnapshot(`"example-base.version"`)
+    expect(getAnchorID(baseItems.variables.version)).toMatchInlineSnapshot(`"example-base.version"`)
   })
 })

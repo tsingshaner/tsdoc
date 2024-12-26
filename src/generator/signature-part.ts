@@ -4,8 +4,7 @@ import { DocFencedCode, type DocNode, DocParagraph, DocSection } from '@microsof
 import type { ApiItem, Excerpt } from '@microsoft/api-extractor-model'
 
 import { getReferenceApiItem } from '../model'
-import { buildCommaNode, buildExcerptTokenWithHyperLink } from '../nodes'
-import { buildExcerptWithHyperLinks } from '../nodes'
+import { buildCommaNode, buildExcerptTokenWithHyperLink, buildExcerptWithHyperLinks } from '../nodes'
 
 import type { GeneratorContext, SignaturePart } from './types'
 

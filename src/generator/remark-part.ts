@@ -2,7 +2,7 @@ import { DocSection, StandardTags } from '@microsoft/tsdoc'
 
 import type { ApiItem } from '@microsoft/api-extractor-model'
 
-import { hasTsdocComment } from '../model/utils'
+import { hasTsdocComment } from '../model'
 import { docBlockFilter } from '../nodes'
 
 import type { GeneratorContext, RemarksPart } from './types'
@@ -28,5 +28,5 @@ export const genRemarkPart = (ctx: GeneratorContext, api: ApiItem): RemarksPart 
     part.examples = exampleBlocks.map((e) => new DocSection({ configuration: ctx.tsdocConfiguration }, e.content.nodes))
   }
 
-  return Reflect.ownKeys(part).length > 0 ? part : undefined
+  return part
 }

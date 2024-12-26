@@ -10,6 +10,21 @@ import type { PathLike } from 'node:fs'
  * {@link https://nodejs.org/docs/latest/api/errors.html#common-system-errors | NodeJS.ErrnoException} maybe throw.
  * If path is not exists, the error with code `ENOENT` will throw.
  *
+ * @example
+ * Basic usage.
+ * ```ts
+ * if (await isDirectory('./doc')) {
+ *   // ...
+ * }
+ * ```
+ *
+ * @example
+ * You can handle error when the path maybe not exists.
+ * ```ts
+ * if (await isDirectory('../doc').catch((() => false))) {
+ *   // ...
+ * }
+ *
  * @public
  */
 export const isDirectory = async (path: PathLike): Promise<boolean> => (await stat(path)).isDirectory()
@@ -23,6 +38,12 @@ export const isDirectory = async (path: PathLike): Promise<boolean> => (await st
  * The error with code `ENOENT` is handled (create an empty directory), other errors will be thrown.
  *
  * @see {@link isDirectory} This call `isDirectory` to check directory.
+ *
+ * @example
+ * Base usage.
+ * ```ts
+ * await cleanDir('./src/pages')
+ * ```
  *
  * @public
  */
