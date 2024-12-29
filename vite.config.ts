@@ -62,6 +62,7 @@ export default defineConfig({
   test: {
     coverage: {
       all: true,
+      exclude: ['src/test-helper.ts', 'src/**/*.test.ts'],
       include: ['src/']
     }
   }
