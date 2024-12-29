@@ -103,7 +103,7 @@ export interface StandardParts extends ArticlePart {
   deprecated?: DocSection
   remarks?: RemarksPart
   signature?: SignaturePart
-  tables:
+  tables?:
     | ClassTablePart
     | EnumTablePart
     | InterfaceTablePart

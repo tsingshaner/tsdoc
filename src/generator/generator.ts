@@ -2,11 +2,11 @@ import { DocSection, StandardTags } from '@microsoft/tsdoc'
 
 import type { ApiItem } from '@microsoft/api-extractor-model'
 
-import { hasTsdocComment } from '../model/utils'
+import { hasTsdocComment } from '../model'
 import { docBlockFilter } from '../nodes'
 import { DocArticle } from '../nodes/custom-nodes/article'
 import { FrontMatterMeta, StandardPart } from './constants'
-import { genArticleFrontMatter } from './handlers'
+import { genArticleFrontMatter } from './frontmatter-meta'
 import { genRemarkPart } from './remark-part'
 import { genSignaturePart } from './signature-part'
 import { genTablesPart } from './table-part'
@@ -45,7 +45,7 @@ const defaultArticleGenerator = (...[ctx, api, options]: HandlerParameters) => {
 
   const tables = genTablesPart(ctx, api)
   if (tables) {
-    parts.tables = tables.part
+    parts.tables = tables.part as StandardParts['tables']
     article.mergeMeta(tables.meta ?? {})
     subApis.push(...(tables.subApis ?? []))
   }

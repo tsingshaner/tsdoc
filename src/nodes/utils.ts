@@ -48,11 +48,8 @@ export const buildExcerptTokenWithHyperLink = (
   return new DocPlainText({ configuration, text: unwrappedTokenText })
 }
 
-export const buildExcerptWithHyperLinks = (excerpt: Excerpt, model: ApiModel, configuration: TSDocConfiguration) => {
-  return excerpt.tokens
-    .slice(excerpt.tokenRange.startIndex, excerpt.tokenRange.endIndex)
-    .map((token) => buildExcerptTokenWithHyperLink(model, token, configuration))
-}
+export const buildExcerptWithHyperLinks = (excerpt: Excerpt, model: ApiModel, configuration: TSDocConfiguration) =>
+  excerpt.spannedTokens.map((token) => buildExcerptTokenWithHyperLink(model, token, configuration))
 
 /**
  * Filter docBlocks by tag name.

@@ -1,2 +1,2 @@
 export { cleanDir, isDirectory } from './fs'
-export { encodeFilename, getUnscopedPackageName } from './model'
+export { encodeFilename, escapeHtml, escapeMarkdown, getUnscopedPackageName } from './string'

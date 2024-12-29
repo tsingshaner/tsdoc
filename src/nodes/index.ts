@@ -15,6 +15,7 @@ import { DocArticle } from './custom-nodes/article'
 
 export {
   CustomDocNodeKind,
+  DocArticle,
   DocBreadcrumb,
   DocEmphasisSpan,
   DocFrontMatter,

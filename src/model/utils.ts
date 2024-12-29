@@ -75,7 +75,18 @@ export const getReferenceApiItem = (model: ApiModel, token: ExcerptToken): ApiIt
   }
 }
 
+/**
+ * 获取 ApiItem 的超链接锚点 ID.
+ * @param model - ApiModel 实例.
+ * @param token - 需要查找的 token.
+ * @returns The anchor ID of the token, or `undefined` if the token is not a reference.
+ */
 export const getExcerptTokenHyperLink = (model: ApiModel, token: ExcerptToken): string | undefined => {
+  /**
+   * @todo 支持根据 `token.canonicalReference` 自定义外部引用链接
+   * - `!Promise:interface` -> `https://developer.mozilla.org/zh-CN/docs/Web/JavaScript/Reference/Global_Objects/Promise`
+   * - `!"\\"fs\\\"\".PathLike:type` -> `https://nodejs.org/dist/v23.5.0/docs/api/fs.html`
+   */
   const referenceApiItem = getReferenceApiItem(model, token)
   return referenceApiItem && getAnchorID(referenceApiItem)
 }

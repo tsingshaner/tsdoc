@@ -23,7 +23,7 @@ import type {
 import type { DocNode, TSDocConfiguration } from '@microsoft/tsdoc'
 
 import { getConciseSignature, isEventProperty, isInitializer, isOptional, isProtected, isStatic } from '../model'
-import { getFilenameFormApiItem, getReleaseTag, isReadonly } from '../model'
+import { getAnchorID, getReleaseTag, isReadonly } from '../model'
 import { hasTsdocComment, isAbstract } from '../model'
 import {
   buildCodeSpanNode,
@@ -61,7 +61,7 @@ const genTitleCell = (api: ApiItem): CellNodesBuilder => {
         configuration,
         linkText,
         tagName: '@link',
-        urlDestination: getFilenameFormApiItem(api)
+        urlDestination: getAnchorID(api)
       })
     ])
   ]
@@ -106,7 +106,7 @@ const genDescriptionCell = (api: ApiItem, isInherited = false): CellNodesBuilder
           configuration,
           linkText: api.parent.displayName,
           tagName: '@link',
-          urlDestination: getFilenameFormApiItem(api.parent)
+          urlDestination: getAnchorID(api.parent)
         }),
         new DocPlainText({ configuration, text: ')' })
       ])
@@ -357,12 +357,12 @@ const genEnumTable = (ctx: GeneratorContext, api: ApiEnum): GenerateResult<EnumT
   for (const apiEnumMember of api.members) {
     enumTable.addRow({
       description: genDescriptionCell(apiEnumMember),
-      member: genInitializerCell(apiEnumMember),
-      value: (configuration) => [
+      member: (configuration) => [
         new DocParagraph({ configuration }, [
           new DocPlainText({ configuration, text: getConciseSignature(apiEnumMember) })
         ])
-      ]
+      ],
+      value: genInitializerCell(apiEnumMember)
     })
   }
 
