@@ -27,7 +27,7 @@ export interface DocTag extends DocNode {
 
 export type Release = ReleaseTag
 
-export interface DocReleaseTag extends DocTag {
+export interface DocReleaseTag extends DocTag, DocNode {
   release: Release
 }
 

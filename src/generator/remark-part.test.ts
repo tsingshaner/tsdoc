@@ -1,7 +1,7 @@
 import { DocSection } from '@microsoft/tsdoc'
 import { describe } from 'vitest'
 
-import { baseItems, generateCtx } from '@/test-helper'
+import { baseItems, generateCtx, hasText } from '@/test-helper'
 
 import { genRemarkPart } from './remark-part'
 
@@ -26,5 +26,15 @@ describe('Should generate remark parts.', (test) => {
 
     expect(remarkPart?.summary).instanceOf(DocSection)
     expect(remarkPart?.remarks).instanceOf(DocSection)
+  })
+
+  test('Should include inherit doc.', ({ expect }) => {
+    const remarkPart = genRemarkPart(generateCtx, baseItems.classes.Server)
+
+    expect(remarkPart?.summary).instanceOf(DocSection)
+    expect(remarkPart?.remarks).instanceOf(DocSection)
+
+    expect(hasText('A server interface.', remarkPart?.summary.getChildNodes())).toBeTruthy()
+    expect(hasText('This interface defines the basic methods for a server.', remarkPart?.remarks?.nodes)).toBeTruthy()
   })
 })

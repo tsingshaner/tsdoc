@@ -6,7 +6,7 @@ import dts from 'vite-plugin-dts'
 const root = import.meta.dirname
 const workspaceRoot = searchForWorkspaceRoot(root)
 
-const reg = /^(lit\/)|(node:)/
+const reg = /^(lit)|(node:)/
 
 export default defineConfig({
   build: {
